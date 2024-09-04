@@ -1,18 +1,31 @@
-// src/router/routes.js
-
 const routes = [
   {
-    path: '/',
-    component: () => import('layouts/MainLayout.vue'),
+    path: "/main",
+    component: () => import("layouts/MainLayout.vue"),
     children: [
-      { path: 'principal', component: () => import('pages/Principal.vue') },
-      { path: 'cuentas', component: () => import('pages/Cuentas.vue') },
-      { path: '', redirect: '/principal' }
+      {
+        path: "",
+        component: () => import("pages/IndexPage.vue"),
+        meta: { auth: true },
+      },
     ],
   },
   {
-    path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue'),
+    path: "/",
+    component: () => import("layouts/LoginLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("pages/UserLogin.vue"),
+      },
+    ],
+  },
+
+  // Always leave this as last one,
+  // but you can also remove it
+  {
+    path: "/:catchAll(.)",
+    component: () => import("pages/ErrorNotFound.vue"),
   },
 ];
 
