@@ -2,114 +2,111 @@
   <q-page class="flex flex-center bg-page">
     <div class="contenedor__todo q-mt-md q-px-md">
       <q-card flat bordered class="caja__trasera q-pa-md">
-        <q-card-section
-          class="q-pa-none caja__trasera-login"
-          ref="caja_trasera_login"
-        >
-          <div class="text-center">
-            <h3>¿Ya tienes una cuenta?</h3>
-            <p>Inicia sesión para entrar en la página</p>
-            <q-btn color="primary" flat @click="iniciarSesion"
-              >Iniciar Sesión</q-btn
-            >
-          </div>
-        </q-card-section>
-        <q-card-section
-          class="q-pa-none caja__trasera-register"
-          ref="caja_trasera_register"
-        >
-          <div class="text-center">
-            <h3>¿Aún no tienes una cuenta?</h3>
-            <p>Regístrate para que puedas iniciar sesión</p>
-            <q-btn color="primary" flat @click="register">Regístrarse</q-btn>
-          </div>
+        <q-card-section class="q-pa-none text-center">
+          <h3 v-if="mostrarLogin">¿Aún no tienes una cuenta?</h3>
+          <h3 v-else>¿Ya tienes una cuenta?</h3>
+          <p v-if="mostrarLogin">
+            Regístrate para que puedas iniciar sesión
+          </p>
+          <p v-else>
+            Inicia sesión para entrar en la página
+          </p>
+          <q-btn
+            color="primary"
+            flat
+            @click="toggleFormulario"
+          >
+            {{ mostrarLogin ? 'Regístrarse' : 'Iniciar Sesión' }}
+          </q-btn>
         </q-card-section>
       </q-card>
 
-      <div
-        class="contenedor__login-register q-mt-md"
-        ref="contenedor_login_register"
-      >
-        <q-form
-          @submit="onSubmit"
-          class="formulario__login q-pa-md"
-          ref="form"
-        >
-          <q-card flat bordered class="q-pa-md">
-            <q-card-section>
-              <h2 class="text-center text-primary">Iniciar Sesión</h2>
-              <q-input
-                v-model="usuario"
-                type="text"
-                placeholder="Correo Electrónico"
-                outlined
-                dense
-                class="q-mt-md"
-              />
-              <q-input
-                v-model="password"
-                type="password"
-                placeholder="Contraseña"
-                outlined
-                dense
-                class="q-mt-md"
-              />
-              <q-btn
-                type="submit"
-                color="primary"
-                label="Entrar"
-                class="q-mt-lg full-width"
-              />
-            </q-card-section>
-          </q-card>
-        </q-form>
+      <div class="contenedor__login-register q-mt-md">
+        <transition name="slide-fade">
+          <q-form
+            v-show="mostrarLogin"
+            @submit="onSubmit"
+            class="formulario__login q-pa-md"
+            ref="formulario_login"
+          >
+            <q-card flat bordered class="q-pa-md">
+              <q-card-section>
+                <h2 class="text-center text-primary">Iniciar Sesión</h2>
+                <q-input
+                  v-model="usuario"
+                  type="text"
+                  placeholder="Correo Electrónico"
+                  outlined
+                  dense
+                  class="q-mt-md"
+                />
+                <q-input
+                  v-model="password"
+                  type="password"
+                  placeholder="Contraseña"
+                  outlined
+                  dense
+                  class="q-mt-md"
+                />
+                <q-btn
+                  type="submit"
+                  color="primary"
+                  label="Entrar"
+                  class="q-mt-lg full-width"
+                />
+              </q-card-section>
+            </q-card>
+          </q-form>
+        </transition>
 
-        <!-- Register -->
-        <q-form
-          @submit="onRegister"
-          class="formulario__register q-pa-md"
-          ref="formulario_register"
-        >
-          <q-card flat bordered class="q-pa-md">
-            <q-card-section>
-              <h2 class="text-center text-primary">Regístrarse</h2>
-              <q-input
-                type="text"
-                placeholder="Nombre completo"
-                outlined
-                dense
-                class="q-mt-md"
-              />
-              <q-input
-                type="text"
-                placeholder="Correo Electrónico"
-                outlined
-                dense
-                class="q-mt-md"
-              />
-              <q-input
-                type="text"
-                placeholder="Usuario"
-                outlined
-                dense
-                class="q-mt-md"
-              />
-              <q-input
-                type="password"
-                placeholder="Contraseña"
-                outlined
-                dense
-                class="q-mt-md"
-              />
-              <q-btn
-                type="submit"
-                color="primary"
-                label="Regístrarse"
-                class="q-mt-lg full-width"
-              />
-            </q-card-section>
-          </q-card>
-        </q-form>
+        <transition name="slide-fade">
+          <q-form
+            v-show="!mostrarLogin"
+            @submit="onRegister"
+            class="formulario__register q-pa-md"
+            ref="formulario_register"
+          >
+            <q-card flat bordered class="q-pa-md">
+              <q-card-section>
+                <h2 class="text-center text-primary">Regístrarse</h2>
+                <q-input
+                  type="text"
+                  placeholder="Nombre completo"
+                  outlined
+                  dense
+                  class="q-mt-md"
+                />
+                <q-input
+                  type="text"
+                  placeholder="Correo Electrónico"
+                  outlined
+                  dense
+                  class="q-mt-md"
+                />
+                <q-input
+                  type="text"
+                  placeholder="Usuario"
+                  outlined
+                  dense
+                  class="q-mt-md"
+                />
+                <q-input
+                  type="password"
+                  placeholder="Contraseña"
+                  outlined
+                  dense
+                  class="q-mt-md"
+                />
+                <q-btn
+                  type="submit"
+                  color="primary"
+                  label="Regístrarse"
+                  class="q-mt-lg full-width"
+                />
+              </q-card-section>
+            </q-card>
+          </q-form>
+        </transition>
       </div>
     </div>
   </q-page>
@@ -129,7 +126,13 @@ const mensaje = ref("");
 const loading = ref(false);
 const errorAutenticacion = ref(false);
 const router = useRouter();
-const form = ref('');
+const form = ref(null);
+
+const mostrarLogin = ref(true);
+
+const toggleFormulario = () => {
+  mostrarLogin.value = !mostrarLogin.value;
+};
 
 const onSubmit = () => {
   loading.value = true;
@@ -148,9 +151,7 @@ const onSubmit = () => {
       },
       rememberMe: false,
     })
-
     .then((response) => {
-
       if (autenticacionStore.ejecucion.respuesta.estado === "NOK") {
         console.log(
           "Error en la autenticacion",
@@ -166,7 +167,6 @@ const onSubmit = () => {
       router.push("/main");
     })
     .catch((error) => {
-
       if (error.response) {
         if (error.response.status === 0) {
           mensaje.value =
@@ -176,106 +176,25 @@ const onSubmit = () => {
       }
     })
     .finally(() => {
-
       $q.loading.hide();
       loading.value = false;
     });
 };
+
+const onRegister = () => {
+  // Manejar registro
+};
 </script>
+
 <style scoped>
-.bg-page {
-  background-image: url("src/assets/images/bg4.jpg");
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-attachment: fixed;
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: opacity 0.5s, transform 0.5s;
 }
 
-.caja__trasera {
-  display: flex;
-  justify-content: center;
-  backdrop-filter: blur(10px);
-  background-color: rgba(0, 128, 255, 0.7); /* Aumenta la opacidad para mejorar la legibilidad */
-  border-radius: 15px; /* Bordes redondeados para un aspecto más moderno */
-  padding: 20px;
-  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1); /* Sombra para destacar la caja */
-}
-
-.caja__trasera h3 {
-  font-weight: 500;
-  font-size: 28px;
-  color: #fff;
-  text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3); /* Sombra para mejorar la legibilidad */
-}
-
-.caja__trasera p {
-  margin-top: 10px;
-  font-size: 16px;
-  font-weight: 300;
-  color: white;
-}
-
-.caja__trasera .q-btn {
-  margin-top: 20px;
-  color: white;
-  border: 2px solid #fff;
-  transition: all 0.3s ease; /* Transición suave en hover */
-}
-
-.caja__trasera .q-btn:hover {
-  background: #fff;
-  color: #46a2fd;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Sombra en hover */
-}
-
-.contenedor__todo {
-  width: 100%;
-  max-width: 800px;
-  margin: auto;
-  position: relative;
-  padding: 20px; /* Añade padding para que los elementos no toquen los bordes */
-}
-
-.contenedor__login-register {
-  display: flex;
-  align-items: center;
-  max-width: 380px;
-  margin: auto;
-  position: relative;
-  transition: all 500ms cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Transición suave */
-}
-
-.formulario__login {
-  opacity: 1;
-  display: block;
-  transition: opacity 0.5s ease; /* Transición suave en la opacidad */
-}
-
-.formulario__register {
-  display: none;
+.slide-fade-enter-from,
+.slide-fade-leave-to {
   opacity: 0;
-  transition: opacity 0.5s ease;
-}
-
-.formulario__register.active {
-  display: block;
-  opacity: 1;
-}
-
-@media screen and (max-width: 850px) {
-  .contenedor__todo {
-    max-width: 350px;
-  }
-
-  .caja__trasera {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .contenedor__login-register {
-    top: -10px;
-    left: -5px;
-    margin: auto;
-  }
+  transform: translateX(10%);
 }
 </style>
