@@ -1,7 +1,7 @@
 <template>
   <q-page class="flex flex-center bg-page">
     <div class="contenedor__todo q-mt-md q-px-md">
-      <q-card flat bordered class="caja__trasera q-pa-md">
+      <q-card flat bordered class="q-pa-md">
         <q-card-section class="q-pa-none text-center">
           <h3 v-if="mostrarLogin">¿Aún no tienes una cuenta?</h3>
           <h3 v-else>¿Ya tienes una cuenta?</h3>
@@ -69,20 +69,6 @@
             <q-card flat bordered class="q-pa-md">
               <q-card-section>
                 <h2 class="text-center text-primary">Regístrarse</h2>
-                <q-input
-                  type="text"
-                  placeholder="Nombre completo"
-                  outlined
-                  dense
-                  class="q-mt-md"
-                />
-                <q-input
-                  type="text"
-                  placeholder="Correo Electrónico"
-                  outlined
-                  dense
-                  class="q-mt-md"
-                />
                 <q-input
                   type="text"
                   placeholder="Usuario"
