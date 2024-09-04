@@ -4,9 +4,16 @@ const routes = [
     component: () => import("layouts/MainLayout.vue"),
     children: [
       {
+        path: "principal",
+        component: () => import("pages/Principal.vue"),
+      },
+      {
+        path: "cuentas",
+        component: () => import("pages/Cuentas.vue"),
+      },
+      {
         path: "",
-        component: () => import("pages/IndexPage.vue"),
-        meta: { auth: true },
+        redirect: "/main/principal",
       },
     ],
   },
@@ -20,11 +27,8 @@ const routes = [
       },
     ],
   },
-
-  // Always leave this as last one,
-  // but you can also remove it
   {
-    path: "/:catchAll(.)",
+    path: "/:catchAll(.*)*",
     component: () => import("pages/ErrorNotFound.vue"),
   },
 ];
