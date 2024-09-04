@@ -1,32 +1,24 @@
 <template>
   <q-page class="flex flex-center bg-page">
-    <div class="contenedor__todo q-mt-md q-px-md">
+    <div class="q-mt-md q-px-md">
       <q-card flat bordered class="q-pa-md">
         <q-card-section class="q-pa-none text-center">
           <h3 v-if="mostrarLogin">¿Aún no tienes una cuenta?</h3>
           <h3 v-else>¿Ya tienes una cuenta?</h3>
-          <p v-if="mostrarLogin">
-            Regístrate para que puedas iniciar sesión
-          </p>
-          <p v-else>
-            Inicia sesión para entrar en la página
-          </p>
-          <q-btn
-            color="primary"
-            flat
-            @click="toggleFormulario"
-          >
-            {{ mostrarLogin ? 'Regístrarse' : 'Iniciar Sesión' }}
+          <p v-if="mostrarLogin">Regístrate para que puedas iniciar sesión</p>
+          <p v-else>Inicia sesión para entrar en la página</p>
+          <q-btn color="primary" flat @click="toggleFormulario">
+            {{ mostrarLogin ? "Regístrarse" : "Iniciar Sesión" }}
           </q-btn>
         </q-card-section>
       </q-card>
 
-      <div class="contenedor__login-register q-mt-md">
+      <div class="q-mt-md">
         <transition name="slide-fade">
           <q-form
             v-show="mostrarLogin"
             @submit="onSubmit"
-            class="formulario__login q-pa-md"
+            class="q-pa-md"
             ref="formulario_login"
           >
             <q-card flat bordered class="q-pa-md">
@@ -63,7 +55,7 @@
           <q-form
             v-show="!mostrarLogin"
             @submit="onRegister"
-            class="formulario__register q-pa-md"
+            class="q-pa-md"
             ref="formulario_register"
           >
             <q-card flat bordered class="q-pa-md">
@@ -139,15 +131,23 @@ const onSubmit = () => {
     })
     .then((response) => {
       if (autenticacionStore.ejecucion.respuesta.estado === "NOK") {
-        console.log(
-          "Error en la autenticacion",
-          autenticacionStore.ejecucion.respuesta.message
-        );
+        $q.notify({
+          color: "negative",
+          position: "top",
+          message: autenticacionStore.ejecucion.respuesta.message,
+          icon: "error",
+        });
       } else {
         usuario.value = null;
         form.value = null;
         password.value = null;
         router.push("/main");
+        $q.notify({
+          color: "positive",
+          position: "top",
+          message: "Inicio de sesión exitoso",
+          icon: "check",
+        });
       }
 
       router.push("/main");
@@ -155,8 +155,12 @@ const onSubmit = () => {
     .catch((error) => {
       if (error.response) {
         if (error.response.status === 0) {
-          mensaje.value =
-            "En este momento no es posible conectarse con el servidor por favor comuníquese con el administrador";
+          $q.notify({
+            color: "negative",
+            position: "top",
+            message: autenticacionStore.ejecucion.respuesta.message,
+            icon: "error",
+          });
           errorAutenticacion.value = true;
         }
       }
