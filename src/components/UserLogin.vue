@@ -132,10 +132,10 @@ const onSubmit = () => {
     .then((response) => {
       if (autenticacionStore.ejecucion.respuesta.estado === "NOK") {
         $q.notify({
-          color: "negative",
-          position: "top",
+          color: "white",
           message: autenticacionStore.ejecucion.respuesta.message,
           icon: "error",
+          textColor: "red",
         });
       } else {
         usuario.value = null;
@@ -143,10 +143,10 @@ const onSubmit = () => {
         password.value = null;
         router.push("/main");
         $q.notify({
-          color: "positive",
-          position: "top",
+          color: "white",
           message: "Inicio de sesión exitoso",
           icon: "check",
+          textColor: "green",
         });
       }
 

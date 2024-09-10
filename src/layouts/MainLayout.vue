@@ -12,8 +12,8 @@
       </q-toolbar>
 
       <q-tabs align="left">
-        <q-route-tab to="/principal" label="Inicio" />
-        <q-route-tab to="/cuentas" label="Cuentas" />
+        <q-route-tab to="principal" label="Inicio" />
+        <q-route-tab to="cuentas" label="Cuentas" />
       </q-tabs>
     </q-header>
 
