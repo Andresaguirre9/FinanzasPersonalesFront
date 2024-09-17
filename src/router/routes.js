@@ -6,14 +6,17 @@ const routes = [
       {
         path: "principal",
         component: () => import("pages/Principal.vue"),
+        meta: { auth: true },
       },
       {
         path: "cuentas",
         component: () => import("pages/Cuentas.vue"),
+        meta: { auth: true },
       },
       {
         path: "",
         redirect: "/main/principal",
+        meta: { auth: true },
       },
     ],
   },

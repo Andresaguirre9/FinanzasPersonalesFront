@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { boot } from "quasar/wrappers";
-import { useAuthStore } from "../stores/auth-store";
+import { useAuthStore } from "../stores/auth";
 import { createPinia } from "pinia";
 
 function isArrayOrString(variable) {
@@ -17,10 +17,12 @@ export default boot(({ app, router, store, Vue }) => {
 
   router.beforeEach((to, from, next) => {
     const record = to.matched.find((record) => record.meta.auth);
+
     if (record) {
       // Control si existe el meta
       //'Existe el meta en el registro'
       if (!autenticacionStore.loggedIn()) {
+
         // No loggedIn
         return autenticacionStore
           .fetch()
@@ -93,4 +95,6 @@ export default boot(({ app, router, store, Vue }) => {
     return autenticacionStore.fetch();
   };
   app.config.globalProperties.$auth = helper;
+
+  autenticacionStore.loginCallbacks = console.log("Logged in");
 });

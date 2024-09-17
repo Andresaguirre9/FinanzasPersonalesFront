@@ -62,6 +62,7 @@
               <q-card-section>
                 <h2 class="text-center text-primary">Regístrarse</h2>
                 <q-input
+                  v-model="usuarioRegistrado"
                   type="text"
                   placeholder="Usuario"
                   outlined
@@ -69,6 +70,7 @@
                   class="q-mt-md"
                 />
                 <q-input
+                  v-model="passwordRegistrado"
                   type="password"
                   placeholder="Contraseña"
                   outlined
@@ -99,7 +101,9 @@ import { useRouter } from "vue-router";
 const $q = useQuasar();
 const autenticacionStore = useAuthStore();
 const usuario = ref("");
+const usuarioRegistrado = ref("");
 const password = ref("");
+const passwordRegistrado = ref("");
 const mensaje = ref("");
 const loading = ref(false);
 const errorAutenticacion = ref(false);
@@ -141,7 +145,9 @@ const onSubmit = () => {
         usuario.value = null;
         form.value = null;
         password.value = null;
+        console.log("holaaaa");
         router.push("/main");
+        console.log("holaaaa");
         $q.notify({
           color: "white",
           message: "Inicio de sesión exitoso",
@@ -172,7 +178,64 @@ const onSubmit = () => {
 };
 
 const onRegister = () => {
-  // Manejar registro
+  loading.value = true;
+
+  $q.loading.show({
+    backgroundColor: "#fff",
+    message: "REGISTRANDO USUARIO ...",
+    messageColor: "white",
+  });
+
+  autenticacionStore
+    .signUp({
+      body: {
+        usuario: usuarioRegistrado.value,
+        password: passwordRegistrado.value,
+      },
+      rememberMe: false,
+    })
+    .then((response) => {
+      if (autenticacionStore.ejecucion.respuesta.estado === "NOK") {
+        $q.notify({
+          color: "white",
+          message: autenticacionStore.ejecucion.respuesta.message,
+          icon: "error",
+          textColor: "red",
+        });
+      } else {
+        usuario.value =
+          autenticacionStore.ejecucion.datos.user.data.usuarioGenerado.usuario;
+        password.value = null;
+        mostrarLogin.value = true;
+
+        usuarioRegistrado.value = null;
+        passwordRegistrado.value = null;
+
+        $q.notify({
+          color: "white",
+          message: "Usuario creado exitosamente, puede iniciar sesión",
+          icon: "check",
+          textColor: "green",
+        });
+      }
+    })
+    .catch((error) => {
+      if (error.response) {
+        if (error.response.status === 0) {
+          $q.notify({
+            color: "negative",
+            position: "top",
+            message: autenticacionStore.ejecucion.respuesta.message,
+            icon: "error",
+          });
+          errorAutenticacion.value = true;
+        }
+      }
+    })
+    .finally(() => {
+      $q.loading.hide();
+      loading.value = false;
+    });
 };
 </script>
 
