@@ -145,7 +145,7 @@ module.exports = configure(function (ctx) {
 
       manifest: {
         name: `finanzas`,
-        short_name: `finanzas`,
+        short_name: `FinanzasPersonales`,
         description: `A Quasar Project`,
         display: "standalone",
         orientation: "portrait",

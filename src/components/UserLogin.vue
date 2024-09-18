@@ -88,6 +88,14 @@
           </q-form>
         </transition>
       </div>
+      <div class="text-center">
+        <div>
+          <q-icon name="lock" />
+          <router-link class="text-black" to="forgot"
+            >Olvidó su contraseña?</router-link
+          >
+        </div>
+      </div>
     </div>
   </q-page>
 </template>

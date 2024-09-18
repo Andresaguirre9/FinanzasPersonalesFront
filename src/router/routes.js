@@ -28,6 +28,15 @@ const routes = [
         path: "",
         component: () => import("pages/UserLogin.vue"),
       },
+      {
+        path: "forgot",
+        component: () => import("pages/ForgotPage.vue"),
+      },
+      {
+        path: "cambio/:tokenreset",
+        component: () => import("pages/ResetPassword.vue"),
+        props: true,
+      },
     ],
   },
   {

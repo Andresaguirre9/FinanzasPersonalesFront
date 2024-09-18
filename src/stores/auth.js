@@ -7,6 +7,8 @@ import { Cookies } from "quasar";
 const LOGIN_ROUTE = "/login";
 const FETCH_USER_ROUTE = "/fetch";
 const singUp_route = "/signup";
+const PASSWORD_FORGOT_ROUTE = "/password/forgot";
+const PASSWORD_RESET_ROUTE = "/password/reset";
 
 export const useAuthStore = defineStore("autenticacion", () => {
   const ejecucionComputada = computed({
@@ -112,6 +114,41 @@ export const useAuthStore = defineStore("autenticacion", () => {
     }
   };
 
+  const forgot = async (usuario) => {
+    const p = new Promise(function (resolve, reject) {
+      return axiosInstance
+        .post(PASSWORD_FORGOT_ROUTE, {
+          usuario,
+        })
+        .then((response) => {
+          ejecucion.value = response.data.ejecucion;
+          resolve();
+        })
+        .catch(function (error) {
+          reject(error);
+        });
+    });
+    return p;
+  };
+  const resetPassword = async (usuario, password, tokenreset) => {
+    const p = new Promise(function (resolve, reject) {
+      return axiosInstance
+        .post(PASSWORD_RESET_ROUTE, {
+          usuario,
+          password,
+          tokenreset,
+        })
+        .then((response) => {
+          ejecucion.value = response.data.ejecucion;
+          resolve();
+        })
+        .catch(function (error) {
+          reject(error);
+        });
+    });
+    return p;
+  };
+
   return {
     doLogin,
     setHeader,
@@ -123,5 +160,7 @@ export const useAuthStore = defineStore("autenticacion", () => {
     email,
     loginCallbacks,
     signUp,
+    forgot,
+    resetPassword,
   };
 });
