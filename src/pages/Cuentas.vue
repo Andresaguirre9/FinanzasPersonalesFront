@@ -269,6 +269,7 @@
 <script setup>
 import { ref, computed, onMounted, defineComponent } from "vue";
 import { useCuentasStore } from "stores/cuentas-store.js";
+import { useBancosStore } from "stores/bancos-store.js";
 import { useRouter } from "vue-router";
 import { useQuasar, date } from "quasar";
 
@@ -325,16 +326,11 @@ const optionsTipoCuenta = ref([
     value: "cdt",
   },
 ]);
-const optionsBanco = ref([
-  {
-    label: "Nubank",
-    value: 1,
-  },
-  {
-    label: "Bancolombia",
-    value: 2,
-  },
-]);
+const optionsBanco = computed({
+  get(){
+    return bancosStore.bancos
+  }
+})
 
 const nuevaCuenta = ref(false);
 const nombreCuenta = ref(null);
@@ -351,6 +347,7 @@ function fixedNumber(number) {
 
 const router = useRouter();
 const cuentasStore = useCuentasStore();
+const bancosStore = useBancosStore();
 const $q = useQuasar();
 const rows = computed({
   get() {
@@ -402,7 +399,8 @@ onMounted(async () => {
       message: "Cargando Cuentas ...",
     });
 
-    await cuentasStore.cargarCuentas(true);
+    await cuentasStore.listarCuentas(true);
+    await bancosStore.cargarBancos();
   } catch (error) {
     if (error.message.includes("Network Error")) {
       $q.notify({
@@ -499,7 +497,7 @@ async function onRequest(pageNumber) {
     });
 
     cuentasStore.pagination.page = +pageNumber;
-    await cuentasStore.cargarCuentas();
+    await cuentasStore.listarCuentas();
   } catch (error) {
     $q.notify({
       progress: true,
@@ -526,7 +524,7 @@ async function ordenarPor(parametrosOrden) {
 
   cuentasStore.pagination.descending = descending;
   cuentasStore.pagination.page = page;
-  cuentasStore.cargarCuentas();
+  cuentasStore.listarCuentas();
   loading.value = false;
 
   $q.loading.hide();

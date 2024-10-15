@@ -1,12 +1,35 @@
 <template>
   <q-page padding class="bg-section">
-    <div class="q-pa-md text-h3 text-bold text-center text-primary">Bienvenido a tu Dashboard de Finanzas Personales</div>
-    <div class="q-pa-sm text-h6 text-center text-secondary">Administra tus ingresos, gastos y ahorros en un solo lugar.</div>
+    <div class="q-pa-md text-h3 text-bold text-center text-primary">
+      Bienvenido a tu Dashboard de Finanzas Personales
+    </div>
+    <div class="q-pa-sm text-h6 text-center text-secondary">
+      Administra tus ingresos, gastos y ahorros en un solo lugar.
+    </div>
 
     <q-card class="q-ma-md q-pa-md">
+      <div class="q-pa-md text-h5 text-bold text-secondary bold">
+        Seleccione su cuenta
+      </div>
+      <q-card-section>
+        <div class="q-gutter-md">
+          <q-select
+            @update:model-value="consultarCuenta"
+            rounded
+            standout="bg-grey-5 text-black"
+            v-model="cuentaSeleccionada"
+            :options="cuentas"
+            label="Standard"
+          />
+        </div>
+      </q-card-section>
+
       <q-card-section class="bg-header text-header text-center q-pa-md">
         <div class="text-h4">Saldo Actual</div>
-        <div class="text-h2 text-bold">$ 10.000.000</div>
+        <div class="text-h2 text-bold" v-if="cuentaConsultada">
+          ${{ cuentaConsultada.saldo_actual }}
+        </div>
+        <div class="text-h2 text-bold" v-else>$ 0</div>
       </q-card-section>
 
       <q-separator dark />
@@ -31,82 +54,162 @@
     </q-card>
 
     <div class="q-pa-md row justify-center">
-      <q-btn icon="account_balance_wallet" label="Ir a Cuentas" color="primary" size="lg" @click="goToCuentas" />
+      <q-btn
+        icon="account_balance_wallet"
+        label="Ir a Cuentas"
+        color="primary"
+        size="lg"
+        @click="goToCuentas"
+      />
     </div>
 
     <q-card class="q-ma-md">
       <q-card-section>
         <div class="text-h6">Seleccionar Fechas:</div>
-        <q-input filled v-model="fechaInicio" label="Fecha Inicio" type="date" class="q-mb-md" />
-        <q-input filled v-model="fechaFin" label="Fecha Fin" type="date" class="q-mb-md" />
+        <q-input
+          filled
+          v-model="fechaInicio"
+          label="Fecha Inicio"
+          type="date"
+          class="q-mb-md"
+        />
+        <q-input
+          filled
+          v-model="fechaFin"
+          label="Fecha Fin"
+          type="date"
+          class="q-mb-md"
+        />
         <q-btn label="Buscar" color="primary" @click="buscar" />
-        <div v-if="mensajeValidacion" class="q-mt-md text-negative">{{ mensajeValidacion }}</div>
+        <div v-if="mensajeValidacion" class="q-mt-md text-negative">
+          {{ mensajeValidacion }}
+        </div>
       </q-card-section>
     </q-card>
   </q-page>
 </template>
 
-<script>
-export default {
-  name: 'PrincipalPage',
-  data() {
-    return {
-      fechaInicio: '',
-      fechaFin: '',
-      mensajeValidacion: ''
-    }
-  },
-  methods: {
-    goToCuentas() {
-      this.$router.push('/cuentas');
-    },
-    buscar() {
-      if (this.fechaInicio && this.fechaFin) {
-        if (this.fechaInicio > this.fechaFin) {
-          this.mensajeValidacion = 'La fecha de inicio no puede ser mayor que la fecha de fin.';
-        } else {
-          this.mensajeValidacion = 'Fechas válidas.';
-          // Lógica adicional para la búsqueda puede ir aquí
-        }
-      } else {
-        this.mensajeValidacion = 'Por favor, seleccione ambas fechas.';
-      }
-    }
+<script setup>
+import { useCuentasStore } from "stores/cuentas-store.js";
+import { ref, defineComponent, onMounted, computed } from "vue";
+import { useRouter } from "vue-router";
+import { useQuasar } from "quasar";
+defineComponent({
+  name: "PrincipalPage",
+});
+
+const fechaInicio = ref("");
+const fechaFin = ref("");
+const mensajeValidacion = ref("");
+const cuentasStore = useCuentasStore();
+const router = useRouter();
+const $q = useQuasar();
+const cuentaSeleccionada = ref("");
+const cuentaConsultada = ref(null);
+
+async function consultarCuenta(option) {
+  try {
+   cuentaConsultada.value = await cuentasStore.consultarCuenta(option.value);
+  } catch (error) {
+    console.log(error);
   }
 }
+
+const cuentas = computed({
+  get() {
+    return cuentasStore.cuentas;
+  },
+});
+
+const goToCuentas = () => {
+  router.push("/cuentas");
+};
+
+onMounted(async () => {
+  try {
+    $q.loading.show({
+      message: "Cargando Cuentas ...",
+    });
+
+    await cuentasStore.cargarCuentas();
+  } catch (error) {
+    if (error.message.includes("Network Error")) {
+      $q.notify({
+        progress: true,
+        message:
+          "Error de conexión con el servidor. Por favor, revisa tu conexión a internet.",
+        icon: "error",
+        color: "red",
+        textColor: "white",
+      });
+    } else if (!error.response) {
+      $q.notify({
+        progress: true,
+        message: "Error al momento de cargar los registros. ",
+        icon: "error",
+        color: "red",
+        textColor: "white",
+      });
+    } else {
+      $q.notify({
+        progress: true,
+        message: error.response.data.split("\n")[0],
+        icon: "error",
+        color: "red",
+        textColor: "white",
+      });
+    }
+  } finally {
+    $q.loading.hide();
+  }
+});
+
+const buscar = () => {
+  if (fechaInicio.value && fechaFin.value) {
+    if (fechaInicio.value > fechaFin.value) {
+      mensajeValidacion.value =
+        "La fecha de inicio no puede ser mayor que la fecha de fin.";
+    } else {
+      mensajeValidacion.value = "Fechas válidas.";
+      // Lógica adicional para la búsqueda puede ir aquí
+    }
+  } else {
+    mensajeValidacion.value = "Por favor, seleccione ambas fechas.";
+  }
+};
 </script>
 
 <style scoped>
 .bg-header {
-  background-color: #2C3E50;
+  background-color: #2c3e50;
 }
 
 .text-header {
-  color: #ECF0F1;
+  color: #ecf0f1;
 }
 
 .bg-section {
-  background-color: #ECF0F1;
+  background-color: #ecf0f1;
 }
 
 .bg-dark {
-  background-color: #2C3E50;
+  background-color: #2c3e50;
 }
 
 .text-white {
-  color: #ECF0F1;
+  color: #ecf0f1;
 }
 
 .text-primary {
-  color: #3498DB;
+  color: #3498db;
 }
 
 .text-secondary {
-  color: #95A5A6;
+  color: #95a5a6;
 }
 
 .text-negative {
-  color: #E74C3C;
+  color: #e74c3c;
 }
 
 .text-center {

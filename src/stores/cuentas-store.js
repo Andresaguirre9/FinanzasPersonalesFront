@@ -6,6 +6,7 @@ const RUTA_CUENTAS = "/cuentas";
 const RUTA_CUENTA_CONSULTA = "/cuentas/consultar";
 const RUTA_CUENTA_AGREGAR = "/cuentas/agregar";
 const RUTA_CUENTA_ACTUALIZAR = "/cuentas/actualizar";
+const RUTA_Cargar_Cuentas = "/cuentas/cargar";
 
 export const useCuentasStore = defineStore("cuentasStore", () => {
   const paginationOriginal = ref({
@@ -31,7 +32,35 @@ export const useCuentasStore = defineStore("cuentasStore", () => {
     dataExportar: [],
   });
 
-  async function cargarCuentas(original) {
+  const cuentas = ref([]);
+  async function cargarCuentas() {
+    try {
+      const p = new Promise(async function (resolve, reject) {
+        try {
+          await axiosInstance
+            .get(RUTA_Cargar_Cuentas)
+            .then((response) => {
+              if (response.data.ejecucion.respuesta.estado === "OK") {
+                cuentas.value = response.data.ejecucion.datos.cuentas;
+                resolve();
+              } else {
+                reject(new Error(response.data.ejecucion.respuesta.mensaje));
+              }
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        } catch (error) {
+          reject(error);
+        }
+      });
+      return p;
+    } catch (error) {
+      console.log("Error en el proceso:", error.message);
+    }
+  }
+
+  async function listarCuentas(original) {
     const params = {
       params: {
         pagination: original ? paginationOriginal.value : pagination.value,
@@ -159,9 +188,11 @@ export const useCuentasStore = defineStore("cuentasStore", () => {
     paginationOriginal,
     actualizarCuenta,
     consultarCuenta,
-    agregarCuenta,
     cargarCuentas,
+    agregarCuenta,
+    listarCuentas,
     pagination,
     records,
+    cuentas,
   };
 });
