@@ -25,6 +25,12 @@ export const useAuthStore = defineStore("autenticacion", () => {
   const email = ref("");
   const loginCallbacks = [];
 
+  const logout = async () => {
+    Cookies.remove("authorization_token");
+    ejecucion.value = null;
+    window.location.reload(true);
+  };
+
   const setHeader = (data) => {
     axiosInstance.defaults.headers.common.Authorization =
       "Bearer " + data.token;
@@ -154,6 +160,7 @@ export const useAuthStore = defineStore("autenticacion", () => {
     setHeader,
     ejecucion,
     loggedIn,
+    logout,
     fetch,
     loginCallback,
     id,

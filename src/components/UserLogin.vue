@@ -142,10 +142,13 @@ const onSubmit = () => {
       rememberMe: false,
     })
     .then((response) => {
+      console.log("en el if", autenticacionStore.ejecucion);
+
       if (autenticacionStore.ejecucion.respuesta.estado === "NOK") {
+        console.log("en el if", autenticacionStore.ejecucion.respuesta);
         $q.notify({
           color: "white",
-          message: autenticacionStore.ejecucion.respuesta.message,
+          message: autenticacionStore.ejecucion.respuesta.mensaje,
           icon: "error",
           textColor: "red",
         });
@@ -153,9 +156,7 @@ const onSubmit = () => {
         usuario.value = null;
         form.value = null;
         password.value = null;
-        console.log("holaaaa");
         router.push("/main");
-        console.log("holaaaa");
         $q.notify({
           color: "white",
           message: "Inicio de sesión exitoso",
@@ -177,6 +178,13 @@ const onSubmit = () => {
           });
           errorAutenticacion.value = true;
         }
+      } else {
+        $q.notify({
+          color: "negative",
+          position: "top",
+          message: autenticacionStore.ejecucion.respuesta.message,
+          icon: "error",
+        });
       }
     })
     .finally(() => {

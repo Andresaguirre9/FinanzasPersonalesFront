@@ -19,7 +19,7 @@
             standout="bg-grey-5 text-black"
             v-model="cuentaSeleccionada"
             :options="cuentas"
-            label="Standard"
+            label="Seleccione tu cuenta"
           />
         </div>
       </q-card-section>
