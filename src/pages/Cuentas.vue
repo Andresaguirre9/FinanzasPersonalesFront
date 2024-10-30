@@ -307,23 +307,23 @@ const columns = [
 const optionsTipoCuenta = ref([
   {
     label: "Débito",
-    value: "debito",
+    value: "Debito",
   },
   {
     label: "Corriente",
-    value: "corriente",
+    value: "Corriente",
   },
   {
     label: "Crédito",
-    value: "credito",
+    value: "Credito",
   },
   {
     label: "Nomina",
-    value: "nomina",
+    value: "Nomina",
   },
   {
     label: "CDT",
-    value: "cdt",
+    value: "Cdt",
   },
 ]);
 const optionsBanco = computed({
@@ -455,10 +455,7 @@ async function confirmarNuevaCuenta() {
     await cuentasStore.agregarCuenta(params);
 
     nuevaCuenta.value = false;
-    onInitialRequest({
-      pagination: initialPagination.value,
-      filter: undefined,
-    });
+    onRequest(1)
     $q.notify({
       message: "Se creó la cuenta exitosamente",
       icon: "done",
@@ -524,7 +521,7 @@ async function ordenarPor(parametrosOrden) {
 
   cuentasStore.pagination.descending = descending;
   cuentasStore.pagination.page = page;
-  cuentasStore.listarCuentas();
+  await cuentasStore.listarCuentas();
   loading.value = false;
 
   $q.loading.hide();

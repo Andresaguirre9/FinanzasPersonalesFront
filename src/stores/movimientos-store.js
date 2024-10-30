@@ -48,7 +48,7 @@ export const useMovimientosStore = defineStore("movimientosStore", () => {
                 pagination.value = response.data.ejecucion.datos.pagination;
                 resolve();
               } else {
-                reject(new Error(response.data.ejecucion.respuesta.mensaje));
+                reject(new Error(response.data.ejecucion.respuesta.message));
               }
             })
             .catch((error) => {
@@ -79,7 +79,7 @@ export const useMovimientosStore = defineStore("movimientosStore", () => {
               if (response.data.ejecucion.respuesta.estado === "OK") {
                 resolve(response.data.ejecucion.datos.movimiento);
               } else {
-                reject(new Error(response.data.ejecucion.respuesta.mensaje));
+                reject(new Error(response.data.ejecucion.respuesta.message));
               }
             })
             .catch((error) => {
@@ -109,8 +109,7 @@ export const useMovimientosStore = defineStore("movimientosStore", () => {
               if (response.data.ejecucion.respuesta.estado === "OK") {
                 resolve(response.data.ejecucion);
               } else {
-                console.log("112 erro");
-                reject(new Error(response.data.ejecucion.respuesta.mensaje));
+                reject(response.data.ejecucion.respuesta.message);
               }
             })
             .catch((error) => {
