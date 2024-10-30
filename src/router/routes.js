@@ -14,6 +14,16 @@ const routes = [
         meta: { auth: true },
       },
       {
+        path: "movimientos",
+        component: () => import("pages/MovimientosPage.vue"),
+        meta: { auth: true },
+      },
+      {
+        path: "metas",
+        component: () => import("pages/MetasPage.vue"),
+        meta: { auth: true },
+      },
+      {
         path: "",
         redirect: "/main/principal",
         meta: { auth: true },
