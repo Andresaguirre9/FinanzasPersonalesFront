@@ -122,7 +122,7 @@ const cuentas = computed({
 });
 
 const goToCuentas = () => {
-  router.push("/cuentas");
+  router.push("/main/cuentas");
 };
 
 onMounted(async () => {
@@ -171,7 +171,6 @@ const buscar = () => {
         "La fecha de inicio no puede ser mayor que la fecha de fin.";
     } else {
       mensajeValidacion.value = "Fechas válidas.";
-      // Lógica adicional para la búsqueda puede ir aquí
     }
   } else {
     mensajeValidacion.value = "Por favor, seleccione ambas fechas.";

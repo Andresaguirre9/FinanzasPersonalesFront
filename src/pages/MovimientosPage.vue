@@ -312,7 +312,7 @@ const optionsCategoria = ref([
   "Entretenimiento",
   "Salud",
   "Comida",
-  "Beleza",
+  "Belleza",
   "Casa",
   "Transporte",
   "Viajes",
