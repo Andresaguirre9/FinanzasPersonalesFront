@@ -5,6 +5,7 @@ import { ref } from "vue";
 const RUTA_MOVIMIENTOS = "/movimientos";
 const RUTA_MOVIMIENTO_CONSULTA = "/movimientos/consultar";
 const RUTA_MOVIMIENTO_AGREGAR = "/movimientos/agregar";
+const RUTA_MOVIMIENTO_TOTALIZAR = "/movimientos/totalizar";
 
 export const useMovimientosStore = defineStore("movimientosStore", () => {
   const paginationOriginal = ref({
@@ -23,6 +24,11 @@ export const useMovimientosStore = defineStore("movimientosStore", () => {
     rowsPerPage: 10,
     rowsNumber: 0,
     limite: 10,
+  });
+
+  const totales = ref({
+    egresos: 0,
+    ingresos: 0,
   });
 
   const records = ref({
@@ -125,12 +131,46 @@ export const useMovimientosStore = defineStore("movimientosStore", () => {
     }
   }
 
+  async function totalizarIngresoEgreso(idCuenta) {
+    const params = {
+      params: {
+        idCuenta: idCuenta,
+      },
+    };
+    try {
+      const p = new Promise(async function (resolve, reject) {
+        try {
+          await axiosInstance
+            .get(RUTA_MOVIMIENTO_TOTALIZAR, params)
+            .then((response) => {
+              if (response.data.ejecucion.respuesta.estado === "OK") {
+                totales.value = response.data.ejecucion.datos.totales;
+                resolve();
+              } else {
+                reject(new Error(response.data.ejecucion.respuesta.message));
+              }
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        } catch (error) {
+          reject(error);
+        }
+      });
+      return p;
+    } catch (error) {
+      console.log("Error en el proceso:", error.message);
+    }
+  }
+
   return {
+    totalizarIngresoEgreso,
     paginationOriginal,
     consultarMovimiento,
     agregarMovimiento,
     listarMovimientos,
     pagination,
     records,
+    totales,
   };
 });

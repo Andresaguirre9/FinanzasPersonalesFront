@@ -27,7 +27,7 @@
       <q-card-section class="bg-header text-header text-center q-pa-md">
         <div class="text-h4">Saldo Actual</div>
         <div class="text-h2 text-bold" v-if="cuentaConsultada">
-          ${{ cuentaConsultada.saldo_actual }}
+          ${{ fixedNumber(cuentaConsultada.saldo_actual) }}
         </div>
         <div class="text-h2 text-bold" v-else>$ 0</div>
       </q-card-section>
@@ -39,7 +39,10 @@
           <q-icon name="arrow_upward" class="q-mr-sm" />
           Ingresos
         </div>
-        <div>$ 20.000.000</div>
+        <div>
+
+          ${{ fixedNumber(totales.ingresos) }}
+        </div>
       </q-card-section>
 
       <q-separator dark />
@@ -49,7 +52,9 @@
           <q-icon name="arrow_downward" class="q-mr-sm" />
           Gastos
         </div>
-        <div>$ 10.000.000</div>
+        <div>
+          ${{ fixedNumber(totales.egresos) }}
+        </div>
       </q-card-section>
     </q-card>
 
@@ -91,6 +96,7 @@
 
 <script setup>
 import { useCuentasStore } from "stores/cuentas-store.js";
+import { useMovimientosStore } from "stores/movimientos-store.js";
 import { ref, defineComponent, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
@@ -102,6 +108,7 @@ const fechaInicio = ref("");
 const fechaFin = ref("");
 const mensajeValidacion = ref("");
 const cuentasStore = useCuentasStore();
+const movimientosStore = useMovimientosStore();
 const router = useRouter();
 const $q = useQuasar();
 const cuentaSeleccionada = ref("");
@@ -109,7 +116,10 @@ const cuentaConsultada = ref(null);
 
 async function consultarCuenta(option) {
   try {
-   cuentaConsultada.value = await cuentasStore.consultarCuenta(option.value);
+    cuentaConsultada.value = await cuentasStore.consultarCuenta(option.value);
+    if (cuentaConsultada.value) {
+      await movimientosStore.totalizarIngresoEgreso(cuentaConsultada.value.id);
+    }
   } catch (error) {
     console.log(error);
   }
@@ -118,6 +128,11 @@ async function consultarCuenta(option) {
 const cuentas = computed({
   get() {
     return cuentasStore.cuentas;
+  },
+});
+const totales = computed({
+  get() {
+    return movimientosStore.totales;
   },
 });
 
@@ -163,6 +178,12 @@ onMounted(async () => {
     $q.loading.hide();
   }
 });
+
+function fixedNumber(number) {
+  return new Intl.NumberFormat("es-CO", {
+    maximumFractionDigits: 2,
+  }).format(+number);
+}
 
 const buscar = () => {
   if (fechaInicio.value && fechaFin.value) {
