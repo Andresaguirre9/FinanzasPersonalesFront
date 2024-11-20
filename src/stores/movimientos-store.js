@@ -165,10 +165,10 @@ export const useMovimientosStore = defineStore("movimientosStore", () => {
 
   return {
     totalizarIngresoEgreso,
+    listarMovimientos,
     paginationOriginal,
     consultarMovimiento,
     agregarMovimiento,
-    listarMovimientos,
     pagination,
     records,
     totales,
