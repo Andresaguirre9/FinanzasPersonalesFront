@@ -5,6 +5,7 @@ import { ref } from "vue";
 const RUTA_CUENTAS = "/cuentas";
 const RUTA_CUENTA_CONSULTA = "/cuentas/consultar";
 const RUTA_CUENTA_AGREGAR = "/cuentas/agregar";
+const RUTA_CUENTA_REPORTE = "/cuentas/enviarreporte";
 const RUTA_CUENTA_ACTUALIZAR = "/cuentas/actualizar";
 const RUTA_Cargar_Cuentas = "/cuentas/cargar";
 
@@ -153,6 +154,35 @@ export const useCuentasStore = defineStore("cuentasStore", () => {
       console.log("Error en el proceso:", error.message);
     }
   }
+  async function enviarReporte(idCuenta) {
+    const params = {
+      idCuenta,
+    };
+
+    try {
+      const p = new Promise(async function (resolve, reject) {
+        try {
+          await axiosInstance
+            .post(RUTA_CUENTA_REPORTE, params)
+            .then((response) => {
+              if (response.data.ejecucion.respuesta.estado === "OK") {
+                resolve();
+              } else {
+                reject(new Error(response.data.ejecucion.respuesta.mensaje));
+              }
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        } catch (error) {
+          reject(error);
+        }
+      });
+      return p;
+    } catch (error) {
+      console.log("Error en el proceso:", error.message);
+    }
+  }
 
   async function actualizarCuenta(datosCuenta) {
     const params = {
@@ -189,6 +219,7 @@ export const useCuentasStore = defineStore("cuentasStore", () => {
     actualizarCuenta,
     consultarCuenta,
     cargarCuentas,
+    enviarReporte,
     agregarCuenta,
     listarCuentas,
     pagination,

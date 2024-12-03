@@ -218,6 +218,21 @@
                   <q-tooltip class="bg-grey-6">Editar cuenta</q-tooltip>
                 </q-btn>
               </div>
+              <div class="col q-pl-md">
+                <q-btn
+                  @click="enviarReporte(JSON.stringify(props.row.id))"
+                  flat
+                  bordered
+                  class
+                  size="10px"
+                  round
+                  color="transparent"
+                  text-color="primary"
+                  icon="mail"
+                >
+                  <q-tooltip class="bg-grey-6">Enviar reporte</q-tooltip>
+                </q-btn>
+              </div>
             </div>
           </q-td>
         </q-tr>
@@ -327,10 +342,10 @@ const optionsTipoCuenta = ref([
   },
 ]);
 const optionsBanco = computed({
-  get(){
-    return bancosStore.bancos
-  }
-})
+  get() {
+    return bancosStore.bancos;
+  },
+});
 
 const nuevaCuenta = ref(false);
 const nombreCuenta = ref(null);
@@ -387,6 +402,51 @@ const initialPagination = ref({
   rowsPerPage: 10,
   rowsNumber: 10,
 });
+
+async function enviarReporte(idcuenta) {
+  try {
+    $q.loading.show({
+      message: "Cargando Cuentas ...",
+    });
+    await cuentasStore.enviarReporte(idcuenta)
+    $q.notify({
+        progress: true,
+        message: "El reporte fue enviado a su correo. ",
+        icon: "done",
+        color: "white",
+        textColor: "primary",
+      });
+  } catch (error) {
+    if (error.message.includes("Network Error")) {
+      $q.notify({
+        progress: true,
+        message:
+          "Error de conexión con el servidor. Por favor, revisa tu conexión a internet.",
+        icon: "error",
+        color: "red",
+        textColor: "white",
+      });
+    } else if (!error.response) {
+      $q.notify({
+        progress: true,
+        message: "Error al momento de generar el reporte. ",
+        icon: "error",
+        color: "red",
+        textColor: "white",
+      });
+    } else {
+      $q.notify({
+        progress: true,
+        message: error.response.data.split("\n")[0],
+        icon: "error",
+        color: "red",
+        textColor: "white",
+      });
+    }
+  } finally {
+    $q.loading.hide();
+  }
+}
 
 onMounted(async () => {
   onInitialRequest({
@@ -455,7 +515,7 @@ async function confirmarNuevaCuenta() {
     await cuentasStore.agregarCuenta(params);
 
     nuevaCuenta.value = false;
-    onRequest(1)
+    onRequest(1);
     $q.notify({
       message: "Se creó la cuenta exitosamente",
       icon: "done",
