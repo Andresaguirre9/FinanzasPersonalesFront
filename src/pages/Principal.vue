@@ -13,14 +13,8 @@
       </div>
       <q-card-section>
         <div class="q-gutter-md">
-          <q-select
-            @update:model-value="consultarCuenta"
-            rounded
-            standout="bg-grey-5 text-black"
-            v-model="cuentaSeleccionada"
-            :options="cuentas"
-            label="Seleccione tu cuenta"
-          />
+          <q-select @update:model-value="consultarCuenta" rounded standout="bg-grey-5 text-black"
+            v-model="cuentaSeleccionada" :options="cuentas" label="Seleccione tu cuenta" />
         </div>
       </q-card-section>
 
@@ -59,35 +53,28 @@
     </q-card>
 
     <div class="q-pa-md row justify-center">
-      <q-btn
-        icon="account_balance_wallet"
-        label="Ir a Cuentas"
-        color="primary"
-        size="lg"
-        @click="goToCuentas"
-      />
+      <q-btn icon="account_balance_wallet" label="Ir a Cuentas" color="primary" size="lg" @click="goToCuentas" />
     </div>
 
     <q-card class="q-ma-md">
       <q-card-section>
         <div class="text-h6">Seleccionar Fechas:</div>
-        <q-input
-          filled
-          v-model="fechaInicio"
-          label="Fecha Inicio"
-          type="date"
-          class="q-mb-md"
-        />
-        <q-input
-          filled
-          v-model="fechaFin"
-          label="Fecha Fin"
-          type="date"
-          class="q-mb-md"
-        />
+        <q-input filled v-model="fechaInicio" label="Fecha Inicio" type="date" class="q-mb-md" />
+        <q-input filled v-model="fechaFin" label="Fecha Fin" type="date" class="q-mb-md" />
         <q-btn label="Buscar" color="primary" @click="buscar" />
         <div v-if="mensajeValidacion" class="q-mt-md text-negative">
           {{ mensajeValidacion }}
+        </div>
+      </q-card-section>
+    </q-card>
+
+    <q-card class="q-pa-sm">
+      <q-card-section class="row q-col-gutter-sm">
+        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+          <line-chart />
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+          <pie-chart />
         </div>
       </q-card-section>
     </q-card>
@@ -95,20 +82,30 @@
 </template>
 
 <script setup>
-import { useCuentasStore } from "stores/cuentas-store.js";
+import { ref, defineComponent, onMounted, computed, defineAsyncComponent } from "vue";
 import { useMovimientosStore } from "stores/movimientos-store.js";
-import { ref, defineComponent, onMounted, computed } from "vue";
+import { useEstadisticasStore } from "stores/estadisticas-store";
+import { useCuentasStore } from "stores/cuentas-store.js";
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 defineComponent({
   name: "PrincipalPage",
 });
 
+const PieChart = defineAsyncComponent(() =>
+  import('src/components/PieChart.vue')
+)
+
+const LineChart = defineAsyncComponent(() =>
+  import('src/components/LineChart.vue')
+)
+
 const fechaInicio = ref("");
 const fechaFin = ref("");
 const mensajeValidacion = ref("");
 const cuentasStore = useCuentasStore();
 const movimientosStore = useMovimientosStore();
+const estadisticasStore = useEstadisticasStore();
 const router = useRouter();
 const $q = useQuasar();
 const cuentaSeleccionada = ref("");
@@ -185,18 +182,65 @@ function fixedNumber(number) {
   }).format(+number);
 }
 
-const buscar = () => {
-  if (fechaInicio.value && fechaFin.value) {
-    if (fechaInicio.value > fechaFin.value) {
-      mensajeValidacion.value =
-        "La fecha de inicio no puede ser mayor que la fecha de fin.";
-    } else {
-      mensajeValidacion.value = "Fechas válidas.";
+async function buscar() {
+
+  try {
+    $q.loading.show({
+      message: "Cargando graficas ...",
+    });
+
+    if (!cuentaConsultada.value) {
+      $q.notify({
+        progress: true,
+        message:
+          "Debe seleccionar primero una cuenta",
+        icon: "error",
+        color: "red",
+        textColor: "white",
+      });
+      return;
     }
-  } else {
-    mensajeValidacion.value = "Por favor, seleccione ambas fechas.";
+
+    const filter = {
+      fechaInicio: fechaInicio.value,
+      fechaFin: fechaFin.value,
+      idCuenta: cuentaConsultada.value.id
+    }
+
+    await estadisticasStore.calcularIngresosEgresos(filter)
+    await estadisticasStore.calcularMovimientosMensuales(filter)
+  } catch (error) {
+    if (error.message.includes("Network Error")) {
+      $q.notify({
+        progress: true,
+        message:
+          "Error de conexión con el servidor. Por favor, revisa tu conexión a internet.",
+        icon: "error",
+        color: "red",
+        textColor: "white",
+      });
+    } else if (!error.response) {
+      $q.notify({
+        progress: true,
+        message: "Error al momento de cargar los registros. ",
+        icon: "error",
+        color: "red",
+        textColor: "white",
+      });
+    } else {
+      $q.notify({
+        progress: true,
+        message: error.response.data.split("\n")[0],
+        icon: "error",
+        color: "red",
+        textColor: "white",
+      });
+    }
+  } finally {
+    $q.loading.hide();
   }
-};
+
+}
 </script>
 
 <style scoped>
